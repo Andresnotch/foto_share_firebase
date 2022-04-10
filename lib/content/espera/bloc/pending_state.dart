@@ -12,10 +12,12 @@ class PendingInitial extends PendingState {}
 class PendingFotosSuccessState extends PendingState {
   // lista de elementos de firebase "fshare collection"
   final List<Map<String, dynamic>> myDisabledData;
+  final List<String> myPhotosIDs;
 
-  PendingFotosSuccessState({required this.myDisabledData});
+  PendingFotosSuccessState(
+      {required this.myDisabledData, required this.myPhotosIDs});
   @override
-  List<Object> get props => [myDisabledData];
+  List<Object> get props => [myDisabledData, myPhotosIDs];
 }
 
 class PendingFotosErrorState extends PendingState {}

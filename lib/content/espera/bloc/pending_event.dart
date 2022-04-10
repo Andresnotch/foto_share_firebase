@@ -8,3 +8,12 @@ abstract class PendingEvent extends Equatable {
 }
 
 class GetAllMyDisabledFotosEvent extends PendingEvent {}
+
+class PublishDisabledFotoEvent extends PendingEvent {
+  final String photo;
+
+  PublishDisabledFotoEvent({required this.photo});
+
+  @override
+  List<Object> get props => [photo];
+}

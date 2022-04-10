@@ -1,41 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_shimmer/flutter_shimmer.dart';
-import 'package:foto_share/content/espera/bloc/pending_bloc.dart';
-import 'package:foto_share/content/espera/item_espera.dart';
+import 'package:foto_share/content/fotos/bloc/fotos_bloc.dart';
+import 'package:foto_share/content/fotos/item_foto.dart';
 
-class EnEspera extends StatelessWidget {
-  const EnEspera({Key? key}) : super(key: key);
+class Fotos extends StatelessWidget {
+  const Fotos({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<PendingBloc, PendingState>(
-      listener: (context, state) {},
-      builder: (context, state) {
-        if (state is PendingFotosLoadingState) {
+    return BlocConsumer<FotosBloc, FotosState>(
+      listener: (context, state) {
+        if (state is FotosErrorState) {
+          // show snackbar
+        }
+      },
+      builder: (coxtext, state) {
+        if (state is FotosLoadingState) {
           return ListView.builder(
             itemCount: 25,
             itemBuilder: (BuildContext context, int index) {
               return YoutubeShimmer();
             },
           );
-        } else if (state is PendingFotosEmptyState) {
+        } else if (state is FotosEmptyState) {
           return Center(child: Text("No hay datos por mostrar"));
-        } else if (state is PendingFotosSuccessState) {
+        } else if (state is FotosSuccessState) {
           return RefreshIndicator(
             onRefresh: () {
-              context.read<PendingBloc>().add(GetAllMyDisabledFotosEvent());
+              context.read<FotosBloc>().add(GetAllMyFotosEvent());
               return Future.delayed(
                 Duration(seconds: 0),
               );
             },
             child: ListView.builder(
-              itemCount: state.myDisabledData.length,
+              itemCount: state.myData.length,
               itemBuilder: (BuildContext context, int index) {
-                return ItemEspera(
-                  nonPublicFData: state.myDisabledData[index],
-                  docID: state.myPhotosIDs[index],
-                );
+                return ItemFoto(nonPublicFData: state.myData[index]);
               },
             ),
           );

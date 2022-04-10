@@ -1,10 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:foto_share/auth/bloc/auth_bloc.dart';
+import 'package:foto_share/content/agregar/bloc/picture_bloc.dart';
 import 'package:foto_share/content/espera/bloc/pending_bloc.dart';
+import 'package:foto_share/content/mi_contenido/bloc/micontenido_bloc.dart';
 import 'package:foto_share/home/home_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'content/fotos/bloc/fotos_bloc.dart';
 import 'login/login_page.dart';
 
 void main() async {
@@ -18,6 +21,15 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => PendingBloc()..add(GetAllMyDisabledFotosEvent()),
+        ),
+        BlocProvider(
+          create: (context) => FotosBloc()..add(GetAllMyFotosEvent()),
+        ),
+        BlocProvider(
+          create: (context) => PictureBloc(),
+        ),
+        BlocProvider(
+          create: (context) => MiContenidoBloc(GetMyContentEvent),
         ),
       ],
       child: MyApp(),

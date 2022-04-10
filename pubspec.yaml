@@ -21,6 +21,11 @@ dependencies:
   firebase_core:
   google_sign_in:
   cloud_firestore:
+  image_picker: ^0.8.5
+  firebase_storage: ^10.2.11
+  share_plus:
+  path_provider: ^2.0.9
+  image_downloader:
 
 
 dev_dependencies:

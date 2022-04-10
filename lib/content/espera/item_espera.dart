@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foto_share/content/espera/bloc/pending_bloc.dart';
 
 class ItemEspera extends StatefulWidget {
   final Map<String, dynamic> nonPublicFData;
-  ItemEspera({Key? key, required this.nonPublicFData}) : super(key: key);
+  final String docID;
+  ItemEspera({Key? key, required this.nonPublicFData, required this.docID})
+      : super(key: key);
 
   @override
   State<ItemEspera> createState() => _ItemEsperaState();
@@ -31,15 +35,22 @@ class _ItemEsperaState extends State<ItemEspera> {
                 fit: BoxFit.cover,
               ),
             ),
-            SwitchListTile(
-              title: Text("${widget.nonPublicFData["title"]}"),
-              subtitle:
-                  Text("${widget.nonPublicFData["publishedAt"].toDate()}"),
-              value: _switchValue,
-              onChanged: (newVal) {
-                setState(() {
-                  _switchValue = newVal;
-                });
+            BlocBuilder<PendingBloc, PendingState>(
+              builder: (context, state) {
+                return SwitchListTile(
+                  title: Text("${widget.nonPublicFData["title"]}"),
+                  subtitle:
+                      Text("${widget.nonPublicFData["publishedAt"].toDate()}"),
+                  value: _switchValue,
+                  onChanged: (newVal) {
+                    setState(() {
+                      context
+                          .read<PendingBloc>()
+                          .add(PublishDisabledFotoEvent(photo: widget.docID));
+                      _switchValue = newVal;
+                    });
+                  },
+                );
               },
             ),
           ],

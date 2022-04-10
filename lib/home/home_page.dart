@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foto_share/auth/bloc/auth_bloc.dart';
+import 'package:foto_share/content/agregar/agregar.dart';
 import 'package:foto_share/content/espera/en_espera.dart';
+import 'package:foto_share/content/fotos/fotos.dart';
+import 'package:foto_share/content/mi_contenido/mi_contenido.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
@@ -11,7 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _currentPageIndex = 1;
+  int _currentPageIndex = 0;
 
   final _pagesNameList = [
     "Fotos 4U",
@@ -21,10 +24,10 @@ class _HomePageState extends State<HomePage> {
   ];
 
   final _pagesList = [
-    Center(child: Text("Fotos 4U")),
+    Fotos(),
     EnEspera(),
-    Center(child: Text("Agregar")),
-    Center(child: Text("Mi contenido")),
+    Publicar(),
+    MiContenido(),
   ];
 
   @override

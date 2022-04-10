@@ -3,16 +3,23 @@ import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 part 'pending_event.dart';
 part 'pending_state.dart';
 
+final storage = FirebaseStorage.instance;
+
 class PendingBloc extends Bloc<PendingEvent, PendingState> {
   PendingBloc() : super(PendingInitial()) {
     on<GetAllMyDisabledFotosEvent>(_getMyDisabledContent);
+    on<PublishDisabledFotoEvent>((event, emit) async {
+      await _uploadDisabledPhoto(event);
+      await _getMyDisabledContent(event, emit);
+    });
   }
 
-  FutureOr<void> _getMyDisabledContent(event, emit) async {
+  FutureOr<void> _getMyDisabledContent(_, emit) async {
     emit(PendingFotosLoadingState());
     try {
       // query para traer el documento con el id del usuario autenticado
@@ -22,7 +29,7 @@ class PendingBloc extends Bloc<PendingEvent, PendingState> {
 
       // query para sacar la data del documento
       var docsRef = await queryUser.get();
-      var listIds = docsRef.data()?["fotosListId"];
+      var userPosts = docsRef.data()?["fotosListId"];
 
       // query para sacar documentos de fshare
       var queryFotos =
@@ -31,16 +38,35 @@ class PendingBloc extends Bloc<PendingEvent, PendingState> {
       // query de Dart filtrando la info utilizando como referencia la lista de ids de docs del usuario actual
       var myDisabledContentList = queryFotos.docs
           .where((doc) =>
-              listIds.contains(doc.id) && doc.data()["public"] == false)
+              userPosts.contains(doc.id) && doc.data()["public"] == false)
           .map((doc) => doc.data().cast<String, dynamic>())
           .toList();
 
+      var userPrivatePosts = queryFotos.docs
+          .where((doc) =>
+              userPosts.contains(doc.id) && doc.data()["public"] == false)
+          .map((doc) => doc.id)
+          .toList();
+
       // lista de documentos filtrados del usuario con sus datos de fotos en espera
-      emit(PendingFotosSuccessState(myDisabledData: myDisabledContentList));
+      emit(PendingFotosSuccessState(
+          myDisabledData: myDisabledContentList,
+          myPhotosIDs: userPrivatePosts));
     } catch (e) {
       print("Error al obtener items en espera: $e");
       emit(PendingFotosErrorState());
       emit(PendingFotosEmptyState());
+    }
+  }
+
+  FutureOr<void> _uploadDisabledPhoto(PublishDisabledFotoEvent event) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('fshare')
+          .doc("${event.photo}")
+          .set({'public': true}, SetOptions(mergeFields: ['public']));
+    } catch (e) {
+      print(e);
     }
   }
 }
